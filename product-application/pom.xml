@@ -11,13 +11,19 @@
     </parent>
 
     <groupId>com.skmonjurul.product-service</groupId>
-    <artifactId>runtime</artifactId>
+    <artifactId>product-application</artifactId>
 
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -37,7 +43,13 @@
         </dependency>
         <dependency>
             <groupId>com.skmonjurul.product-service</groupId>
-            <artifactId>service</artifactId>
+            <artifactId>product-api-contract</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
