@@ -1,0 +1,6 @@
+in: header
+name: X-Tenant-Id
+description: The Tenancy parameter
+required: false
+schema:
+  type: string
