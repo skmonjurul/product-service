@@ -1,0 +1,6 @@
+in: header
+name: X-Trace-Id
+description: A unique id representing a workflow, as a request flows through multiple distributed system
+required: false
+schema:
+  type: string
