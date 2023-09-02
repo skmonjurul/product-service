@@ -1,0 +1,240 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Product service
+  description: |
+    The product service 
+
+  license:
+    name: Apache 2.0
+
+
+servers:
+  - url: http://localhost:9000
+    description: Local test server
+  - url: https://product-service.dev-skmonjurul.com
+    description: Dev test server
+
+paths:
+  /api/v1/products:
+    post:
+      summary: Create a Product
+      operationId: createProduct
+      tags:
+        - Product
+      security:
+        - oAuthRbac:
+            - product_write
+      requestBody:
+        description: Product to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      parameters:
+        - $ref: "./schemas/tenancy_params.yaml"
+        - $ref: "./schemas/trace_params.yaml"
+      responses:
+        '200':
+          description: Successfully created the product.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        '400':
+          description: |
+            Bad Request. The request body or parameter does not conform to the schema
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: |
+            Unauthorized. indicates the request doest not contain a valid token to authenticate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '403':
+          description: |
+            Forbidden. Indicates the authenticated entity does not have the privilege to perform the operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+        '500':
+          description: |
+            Internal server error. The server encountered an unexpected error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get all the products
+      operationId: getProducts
+      tags:
+        - Product
+      security:
+        - oAuthRbac:
+            - product_read
+      parameters:
+        - $ref: "./schemas/tenancy_params.yaml"
+        - $ref: "./schemas/trace_params.yaml"
+      responses:
+        '200':
+          description: Successfully returned all the products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /api/v1/products/{productId}:
+    get:
+      summary: Get the product
+      operationId: getProductById
+      tags:
+        - Product
+      security:
+        - oAuthRbac:
+            - product_read
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "./schemas/tenancy_params.yaml"
+        - $ref: "./schemas/trace_params.yaml"
+      responses:
+        '200':
+          description: Successfully returned the products with the mentioned product id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    put:
+      summary: Update the product
+      operationId: updateProduct
+      tags:
+        - Product
+      security:
+        - oAuthRbac:
+            - product_write
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "./schemas/tenancy_params.yaml"
+        - $ref: "./schemas/trace_params.yaml"
+      requestBody:
+        description: update the product
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        '200':
+          description: Successfully updated the product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+    delete:
+      summary: Delete the product
+      operationId: deleteProduct
+      tags:
+        - Product
+      security:
+        - oAuthRbac:
+            - product_write
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "./schemas/tenancy_params.yaml"
+        - $ref: "./schemas/trace_params.yaml"
+      responses:
+        '200':
+          description: Successfully deleted the product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+
+
+
+components:
+  securitySchemes:
+    oAuthRbac:
+      type: oauth2
+      description: This API uses OAuth 2.0 with *client_credentials* grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://keycloak.dev-skmonjurul.com/realms/skmonjurul/protocol/openid-connect/token
+          scopes:
+            product_read: Read product information
+            product_write: Write / update product information
+  schemas:
+    Product:
+      description: Represents a legal entity in the system
+      type: object
+      required:
+        - title
+        - price
+        - category
+      properties:
+        productId:
+          readOnly: true
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        image:
+          type: string
+        category:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedDate:
+          type: string
+          format: date-time
+          readOnly: true
+    Error:
+      description: |
+        The error message.
+        **The below table describes custom error codes returned currently**
+
+        | code | message                          |
+        | -----| ---------------------------------|
+        | 400  | Bad Request                      |
+        | 401  | Unauthorized                     |
+        | 403  | Forbidden                        |
+        | 500  | Internal server error            |
+
+      type: object
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST_ERROR
+        message:
+          type: string
+          example: Internal server error
