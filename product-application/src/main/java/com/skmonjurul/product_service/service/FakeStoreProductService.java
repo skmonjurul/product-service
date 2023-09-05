@@ -1,0 +1,57 @@
+package com.skmonjurul.product_service.service;
+
+import com.skmonjurul.product_service.openapi.model.Product;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+
+
+@Service
+public class FakeStoreProductService implements ProductService{
+    
+    private static final String URL = "https://fakestoreapi.com/products";
+    
+    private final RestTemplate restTemplate;
+    
+    public FakeStoreProductService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Product> getAllProducts() {
+        return restTemplate.getForObject(URL, List.class);
+    }
+    
+    @Override
+    public Product getProductById(String id) {
+        return restTemplate.getForObject(URL + "/" + id, Product.class);
+    }
+    
+    @Override
+    public Product createProduct(Product product) {
+        return restTemplate.postForObject(URL, product, Product.class);
+    }
+    
+    @Override
+    public Product updateProduct(String id, Product product){
+        HttpEntity<Product> entity = new HttpEntity<>(product);
+        return restTemplate
+                .exchange(URL + "/{id}", HttpMethod.PUT, entity, Product.class, Map.of("id", id))
+                .getBody();
+    }
+    
+    @Override
+    public Product deleteProduct(String id) {
+        return restTemplate
+                .exchange(URL + "/{id}", HttpMethod.DELETE, null, Product.class, Map.of("id", id))
+                .getBody();
+    }
+}
