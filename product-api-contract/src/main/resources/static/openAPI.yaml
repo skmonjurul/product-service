@@ -91,7 +91,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Product"
-  /api/v1/products/{productId}:
+  /api/v1/products/{id}:
     get:
       summary: Get the product
       operationId: getProductById
@@ -101,12 +101,12 @@ paths:
         - oAuthRbac:
             - product_read
       parameters:
-        - name: productId
+        - name: id
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - $ref: "./schemas/tenancy_params.yaml"
         - $ref: "./schemas/trace_params.yaml"
       responses:
@@ -125,12 +125,12 @@ paths:
         - oAuthRbac:
             - product_write
       parameters:
-        - name: productId
+        - name: id
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - $ref: "./schemas/tenancy_params.yaml"
         - $ref: "./schemas/trace_params.yaml"
       requestBody:
@@ -157,12 +157,12 @@ paths:
         - oAuthRbac:
             - product_write
       parameters:
-        - name: productId
+        - name: id
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - $ref: "./schemas/tenancy_params.yaml"
         - $ref: "./schemas/trace_params.yaml"
       responses:
@@ -196,10 +196,10 @@ components:
         - price
         - category
       properties:
-        productId:
+        id:
           readOnly: true
           type: string
-          format: uuid
+#          format: uuid
         title:
           type: string
         description:
