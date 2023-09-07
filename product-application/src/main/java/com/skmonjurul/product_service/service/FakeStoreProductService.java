@@ -1,5 +1,6 @@
 package com.skmonjurul.product_service.service;
 
+import com.skmonjurul.product_service.exception.ResourceNotFoundException;
 import com.skmonjurul.product_service.openapi.model.Product;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,7 +29,10 @@ public class FakeStoreProductService implements ProductService{
     
     @Override
     public Product getProductById(String id) {
-        return restTemplate.getForObject(URL + "/" + id, Product.class);
+        Product product = restTemplate.getForObject(URL + "/" + id, Product.class);
+        if (product == null)
+            throw new ResourceNotFoundException("Product with id " + id + " not found");
+        return product;
     }
     
     @Override
