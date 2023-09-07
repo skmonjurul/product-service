@@ -3,6 +3,7 @@ package com.skmonjurul.product_service.controller;
 import com.skmonjurul.product_service.openapi.api.ProductApi;
 import com.skmonjurul.product_service.openapi.model.Product;
 import com.skmonjurul.product_service.service.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,13 +16,13 @@ public class ProductController implements ProductApi {
     
     private final ProductService productService;
     
-    public ProductController(ProductService productService) {
+    public ProductController(@Qualifier("fakeStoreProductService") ProductService productService) {
         this.productService = productService;
     }
     
     @Override
     public ResponseEntity<Product> createProduct(Product product, String xTenantId, String xTraceId) {
-        return ResponseEntity.ok(productService.createProduct(product));
+        return new ResponseEntity<>(productService.createProduct(product), HttpStatus.CREATED);
     }
     
     @Override
