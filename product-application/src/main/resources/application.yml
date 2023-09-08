@@ -1,6 +1,8 @@
 spring:
   application:
     name: product-service
+  devtools:
+    add-properties: ${SPRING_DEVTOOLS_ADD_PROPERTIES:true}
 
 server:
   port: 9000
@@ -18,7 +20,7 @@ management:
     enabled-by-default: false
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       enabled: true
@@ -28,6 +30,8 @@ management:
       enabled: true
     metrics:
       enabled: true
+    prometheus:
+      enabled: true
   info:
     env:
       enabled: true
@@ -35,3 +39,17 @@ management:
       enabled: true
     os:
       enabled: true
+  datadog:
+    metrics:
+      export:
+        api-key: ${DATADOG_API_KEY}
+        uri: https://us5.datadoghq.com
+        step: 10s
+        host-tag: ${spring.application.name}
+  metrics:
+    tags:
+      application.name: ${spring.application.name}
+      env: ${SPRING_PROFILES_ACTIVE:default}
+#logging:
+#  level:
+#    root: debug
