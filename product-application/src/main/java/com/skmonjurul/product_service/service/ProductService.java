@@ -2,7 +2,6 @@ package com.skmonjurul.product_service.service;
 
 import com.skmonjurul.product_service.openapi.model.Product;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 public interface ProductService {

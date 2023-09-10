@@ -1,57 +1,64 @@
 package com.skmonjurul.product_service.service;
 
-import com.skmonjurul.product_service.exception.ResourceNotFoundException;
+import com.skmonjurul.product_service.entity.FakestoreProductEntity;
+import com.skmonjurul.product_service.entity.ProductEntity;
 import com.skmonjurul.product_service.openapi.model.Product;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
+import com.skmonjurul.product_service.repository.ProductRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
-public class FakeStoreProductService implements ProductService{
+public class FakeStoreProductService implements ProductService {
+    private final ProductRepository productRepository;
     
-    private static final String URL = "https://fakestoreapi.com/products";
-    
-    private final RestTemplate restTemplate;
-    
-    public FakeStoreProductService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public FakeStoreProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
     
     @Override
-    @SuppressWarnings("unchecked")
     public List<Product> getAllProducts() {
-        return restTemplate.getForObject(URL, List.class);
+        return productRepository.getAllProducts()
+                .stream()
+                .map(this::productEntityToProduct)
+                .toList();
     }
     
     @Override
     public Product getProductById(String id) {
-        Product product = restTemplate.getForObject(URL + "/" + id, Product.class);
-        if (product == null)
-            throw new ResourceNotFoundException("Product with id " + id + " not found");
-        return product;
+        return productEntityToProduct(productRepository.getProduct(id));
     }
     
     @Override
     public Product createProduct(Product product) {
-        return restTemplate.postForObject(URL, product, Product.class);
+        return productEntityToProduct(productRepository.createProduct(productToProductEntity(product)));
     }
     
     @Override
     public Product updateProduct(String id, Product product){
-        HttpEntity<Product> entity = new HttpEntity<>(product);
-        return restTemplate
-                .exchange(URL + "/{id}", HttpMethod.PUT, entity, Product.class, Map.of("id", id))
-                .getBody();
+        return productEntityToProduct(productRepository.updateProduct(id, productToProductEntity(product)));
     }
     
     @Override
     public Product deleteProduct(String id) {
-        return restTemplate
-                .exchange(URL + "/{id}", HttpMethod.DELETE, null, Product.class, Map.of("id", id))
-                .getBody();
+        return productEntityToProduct(productRepository.deleteProduct(id));
+    }
+    
+    private Product productEntityToProduct(ProductEntity productEntity) {
+        Product product = new Product(productEntity.getTitle(), productEntity.getPrice(), productEntity.getCategory());
+        return product.id(productEntity.getId())
+                .description(productEntity.getDescription())
+                .image(productEntity.getImage());
+        
+    }
+    
+    private ProductEntity productToProductEntity(Product product) {
+        FakestoreProductEntity productEntity = new FakestoreProductEntity();
+        productEntity.setTitle(product.getTitle());
+        productEntity.setPrice(product.getPrice());
+        productEntity.setCategory(product.getCategory());
+        productEntity.setDescription(product.getDescription());
+        productEntity.setImage(product.getImage());
+        return productEntity;
     }
 }

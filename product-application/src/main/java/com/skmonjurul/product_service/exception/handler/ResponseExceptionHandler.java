@@ -28,4 +28,11 @@ public class ResponseExceptionHandler {
     public ErrorResponse handleJsonParserError(Throwable ex) {
         return ErrorResponse.builder(ex, HttpStatus.BAD_REQUEST, "Request json body is not valid").build();
     }
+    
+    
+    @ExceptionHandler
+    public ErrorResponse handleException(Exception ex) {
+        return ErrorResponse.builder(ex, HttpStatus.INTERNAL_SERVER_ERROR,
+                "Unknown error while processing the request").build();
+    }
 }
