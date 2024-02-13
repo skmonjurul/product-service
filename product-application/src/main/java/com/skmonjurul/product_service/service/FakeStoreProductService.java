@@ -4,15 +4,17 @@ import com.skmonjurul.product_service.entity.FakestoreProductEntity;
 import com.skmonjurul.product_service.entity.ProductEntity;
 import com.skmonjurul.product_service.openapi.model.Product;
 import com.skmonjurul.product_service.repository.ProductRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 
 @Service
-public class FakeStoreProductService implements ProductService {
-    private final ProductRepository productRepository;
+@Primary
+public class FakeStoreProductService implements ProductService<String> {
+    private final ProductRepository<ProductEntity<String>> productRepository;
     
-    public FakeStoreProductService(ProductRepository productRepository) {
+    public FakeStoreProductService(ProductRepository<ProductEntity<String>> productRepository) {
         this.productRepository = productRepository;
     }
     
@@ -44,21 +46,13 @@ public class FakeStoreProductService implements ProductService {
         return productEntityToProduct(productRepository.deleteProduct(id));
     }
     
-    private Product productEntityToProduct(ProductEntity productEntity) {
-        Product product = new Product(productEntity.getTitle(), productEntity.getPrice(), productEntity.getCategory());
-        return product.id(productEntity.getId())
-                .description(productEntity.getDescription())
-                .image(productEntity.getImage());
-        
-    }
-    
-    private ProductEntity productToProductEntity(Product product) {
-        FakestoreProductEntity productEntity = new FakestoreProductEntity();
-        productEntity.setTitle(product.getTitle());
-        productEntity.setPrice(product.getPrice());
-        productEntity.setCategory(product.getCategory());
-        productEntity.setDescription(product.getDescription());
-        productEntity.setImage(product.getImage());
-        return productEntity;
+    public ProductEntity<String> productToProductEntity(Product product) {
+        return FakestoreProductEntity.builder()
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .category(product.getCategory())
+                .description(product.getDescription())
+                .image(product.getImage())
+                .build();
     }
 }

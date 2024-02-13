@@ -5,15 +5,15 @@ import com.skmonjurul.product_service.entity.FakestoreProductEntity;
 import com.skmonjurul.product_service.entity.ProductEntity;
 import com.skmonjurul.product_service.exception.ResourceNotFoundException;
 import com.skmonjurul.shared_library.web.client.RestTemplateClient;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
-public class FakestoreProductRepository implements ProductRepository{
+public class FakestoreProductRepository extends ProductRepository<ProductEntity<String>>{
     
     private static final String URL = "https://fakestoreapi.com/products";
     
@@ -23,35 +23,32 @@ public class FakestoreProductRepository implements ProductRepository{
         this.restTemplate = restTemplate;
     }
     @Override
-    public List<ProductEntity> getAllProducts() {
-        FakestoreProductEntity[] products = restTemplate.getForObject(URL, FakestoreProductEntity[].class);
-        assert products != null;
-        return List.of(products);
+    public List<ProductEntity<String>> getAllProducts() {
+        return List.of(Optional.ofNullable(restTemplate.getForObject(URL, FakestoreProductEntity[].class))
+                .orElseGet(ArrayUtils::toArray));
     }
     
     @Override
-    public ProductEntity getProduct(String id) {
-        FakestoreProductEntity product = restTemplate.getForObject(URL + "/" + id, FakestoreProductEntity.class);
-        if (product == null)
-            throw new ResourceNotFoundException("Product with id " + id + " not found");
-        return product;
+    public ProductEntity<String> getProduct(String id) {
+        return Optional.ofNullable(restTemplate.getForObject(URL + "/" + id, FakestoreProductEntity.class))
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found"));
     }
     
     @Override
-    public ProductEntity createProduct(ProductEntity product) {
+    public ProductEntity<String> createProduct(ProductEntity<String> product) {
         return restTemplate.postForObject(URL, product, FakestoreProductEntity.class);
     }
     
     @Override
-    public ProductEntity updateProduct(String id, ProductEntity product) {
-        HttpEntity<ProductEntity> entity = new HttpEntity<>(product);
+    public ProductEntity<String> updateProduct(String id, ProductEntity<String> product) {
+        HttpEntity<ProductEntity<String>> entity = new HttpEntity<>(product);
         return restTemplate
                 .exchange(URL + "/{id}", HttpMethod.PUT, entity, FakestoreProductEntity.class, Map.of("id", id))
                 .getBody();
     }
     
     @Override
-    public ProductEntity deleteProduct(String id) {
+    public ProductEntity<String> deleteProduct(String id) {
         return restTemplate
                 .exchange(URL + "/{id}", HttpMethod.DELETE, null, FakestoreProductEntity.class,
                         Map.of("id", id)).getBody();
