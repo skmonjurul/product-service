@@ -3,6 +3,14 @@ spring:
     name: product-service
   devtools:
     add-properties: ${SPRING_DEVTOOLS_ADD_PROPERTIES:true}
+  datasource:
+    url: jdbc:mysql://localhost:3306/products
+    username: root
+    password: Logan123@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 server:
   port: 9000
@@ -53,3 +61,4 @@ management:
 #logging:
 #  level:
 #    root: debug
+

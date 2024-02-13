@@ -1,7 +1,7 @@
 package com.skmonjurul.product_service.entity;
 
-public interface ProductEntity {
-    String getId();
+public interface ProductEntity<T> {
+    T getId();
     
     String getTitle();
     

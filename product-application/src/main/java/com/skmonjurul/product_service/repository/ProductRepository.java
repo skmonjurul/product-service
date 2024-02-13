@@ -4,15 +4,15 @@ import com.skmonjurul.product_service.entity.ProductEntity;
 
 import java.util.List;
 
-public interface ProductRepository {
+public abstract class ProductRepository<T> {
     
-    List<ProductEntity> getAllProducts();
+    public abstract List<T> getAllProducts();
     
-    ProductEntity getProduct(String id);
+    public abstract T getProduct(String id);
     
-    ProductEntity createProduct(ProductEntity product);
+    public abstract T createProduct(T product);
     
-    ProductEntity updateProduct(String id, ProductEntity product);
+    public abstract T updateProduct(String id, T product);
     
-    ProductEntity deleteProduct(String id);
+    public abstract T deleteProduct(String id);
 }
